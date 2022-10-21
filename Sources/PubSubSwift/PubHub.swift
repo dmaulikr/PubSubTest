@@ -32,6 +32,15 @@ public class PubSubTest {
         }
         return receipt
     }
+    
+    public func subscribe<T: EventType>(block: @escaping (T) -> ()) -> Receipt {
+        let (observation, receipt) = Subscription.create(observer: nil, block: block)
+        _observations.synchronized {
+            $0 = $0.filter { $0.isValid }
+            $0.append(observation)
+        }
+        return receipt
+    }
 
     // To check Whether we have an active subscription for a given observer.
     public func isSubscribed(_ observer: AnyObject) -> Bool {
